@@ -36,10 +36,10 @@ test.describe("public digital card", () => {
     await page.goto("/index.html");
 
     await expect(page.getByRole("link", { name: "Email Jack" })).toHaveCount(0);
-    await expect(page.getByRole("link", { name: "LinkedIn" })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "LinkedIn" })).toHaveCount(1);
     await expect(page.locator('[data-action-key="copyEmail"]')).toHaveCount(0);
     await expect(page.locator('[data-action-key="copyPhone"]')).toHaveCount(0);
-    await expect(page.locator('[data-action-key="copyWebsite"]')).toHaveCount(0);
+    await expect(page.locator('[data-action-key="copyWebsite"]')).toHaveCount(1);
     await expect(page.locator(".manual-copy-panel")).toBeHidden();
   });
 

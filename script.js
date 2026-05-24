@@ -377,6 +377,89 @@
       : config.profile.positioning.primary;
   }
 
+  function splitNameLines(value) {
+    var parts = trimString(value).split(/\s+/).filter(Boolean);
+    if (!parts.length) {
+      return ["Jack", "Tinsley"];
+    }
+    if (parts.length === 1) {
+      return [parts[0]];
+    }
+    return [parts.slice(0, parts.length - 1).join(" "), parts[parts.length - 1]];
+  }
+
+  function splitTitleLines(value) {
+    var parts = trimString(value).split(/\s+/).filter(Boolean);
+    if (!parts.length) {
+      return [];
+    }
+    if (parts.length === 1) {
+      return [parts[0]];
+    }
+    if (parts.length === 2) {
+      return [parts[0], parts[1]];
+    }
+
+    var midpoint = Math.ceil(parts.length / 2);
+    return [parts.slice(0, midpoint).join(" "), parts.slice(midpoint).join(" ")];
+  }
+
+  function renderLineSpans(lines, className) {
+    return lines
+      .filter(Boolean)
+      .map(function (line) {
+        return '<span class="' + className + '">' + escapeHtml(line) + "</span>";
+      })
+      .join(" ");
+  }
+
+  function renderActionIcon(key) {
+    var icons = {
+      addToContacts:
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"></path><path d="M4.8 19.5a7.2 7.2 0 0 1 14.4 0"></path><path d="M19 7v6"></path><path d="M16 10h6"></path></svg>',
+      viewCv:
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5h6l4 4v13H7z"></path><path d="M13 3.5v4h4"></path><path d="M9.8 13h4.4"></path><path d="M9.8 16h4.4"></path></svg>',
+      email:
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16v11H4z"></path><path d="m4.8 7.2 7.2 5 7.2-5"></path></svg>',
+      linkedIn:
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 9.5v8"></path><path d="M6.5 6.5v.1"></path><path d="M11 17.5v-8"></path><path d="M11 13.1c0-2.2 1.3-3.8 3.4-3.8 2 0 3.1 1.3 3.1 3.7v4.5"></path></svg>',
+      portfolio:
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 7.5h15v11h-15z"></path><path d="M9 7.5v-2h6v2"></path><path d="M4.5 12.5h15"></path></svg>',
+      research:
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 4.5h8a3 3 0 0 1 3 3v12h-8a3 3 0 0 0-3 3z"></path><path d="M16.5 7.5h2a2 2 0 0 1 2 2v10h-4"></path></svg>',
+      capstone:
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 4 8 4-8 4-8-4z"></path><path d="m6 10.5 6 3 6-3"></path><path d="m6 14 6 3 6-3"></path></svg>',
+      copyEmail:
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8h10v12H8z"></path><path d="M6 16H4V4h12v2"></path></svg>',
+      copyPhone:
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 5.5 11 8l-2 2c.8 1.8 2.4 3.4 4.2 4.2l2-2 2.6 2.6c.4.4.5 1 .2 1.5-.8 1.6-2.4 2.6-4.2 2.2-4.6-.9-8.5-4.8-9.3-9.4-.3-1.7.7-3.3 2.2-4 .6-.3 1.2-.2 1.8.4Z"></path></svg>',
+      copyWebsite:
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 13.5a4 4 0 0 0 5.7 0l2-2a4 4 0 0 0-5.7-5.7l-1.1 1.1"></path><path d="M13.5 10.5a4 4 0 0 0-5.7 0l-2 2a4 4 0 0 0 5.7 5.7l1.1-1.1"></path></svg>',
+      copyAll:
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8h10v12H8z"></path><path d="M5 16V5h11"></path><path d="M11 12h4"></path><path d="M11 15h4"></path></svg>'
+    };
+
+    return (
+      '<span class="button__icon">' +
+      (icons[key] || icons.copyAll) +
+      "</span>"
+    );
+  }
+
+  function renderButtonContent(action) {
+    return (
+      renderActionIcon(action.key) +
+      '<span class="button__label">' +
+      escapeHtml(action.label) +
+      "</span>"
+    );
+  }
+
+  function revealStyle(index, offset) {
+    var delay = offset + index * 0.055;
+    return ' style="--reveal-delay: ' + delay.toFixed(3) + '"';
+  }
+
   function buildVCard(config) {
     var nameParts = trimString(config.profile.name).split(/\s+/).filter(Boolean);
     var family = "";
@@ -644,15 +727,18 @@
 
   function renderButtons(actions, interactive) {
     return actions
-      .map(function (action) {
+      .map(function (action, index) {
+        var reveal = revealStyle(index, 0.14);
         if (!interactive) {
           return (
-            '<span class="button" aria-hidden="true" data-variant="' +
+            '<span class="button reveal-item" aria-hidden="true" data-variant="' +
             escapeHtml(action.variant || "ghost") +
             '" data-action-key="' +
             escapeHtml(action.key) +
-            '">' +
-            escapeHtml(action.label) +
+            '"' +
+            reveal +
+            ">" +
+            renderButtonContent(action) +
             "</span>"
           );
         }
@@ -661,7 +747,7 @@
           var isExternal = /^https?:/i.test(action.href);
           var attrs = isExternal ? ' target="_blank" rel="noopener noreferrer"' : "";
           return (
-            '<a class="button" data-variant="' +
+            '<a class="button reveal-item" data-variant="' +
             escapeHtml(action.variant || "ghost") +
             '" data-action-key="' +
             escapeHtml(action.key) +
@@ -669,21 +755,24 @@
             escapeHtml(action.href) +
             '"' +
             attrs +
+            reveal +
             ">" +
-            escapeHtml(action.label) +
+            renderButtonContent(action) +
             "</a>"
           );
         }
 
         return (
-          '<button type="button" class="button" data-variant="' +
+          '<button type="button" class="button reveal-item" data-variant="' +
           escapeHtml(action.variant || "ghost") +
           '" data-action-key="' +
           escapeHtml(action.key) +
           '" data-card-action="' +
           escapeHtml(action.action) +
-          '">' +
-          escapeHtml(action.label) +
+          '"' +
+          reveal +
+          ">" +
+          renderButtonContent(action) +
           "</button>"
         );
       })
@@ -692,25 +781,30 @@
 
   function renderCopyButtons(actions, interactive) {
     return actions
-      .map(function (action) {
+      .map(function (action, index) {
+        var reveal = revealStyle(index, 0.36);
         if (!interactive) {
           return (
-            '<span class="button" data-action-key="' +
+            '<span class="button reveal-item" data-action-key="' +
             escapeHtml(action.key) +
-            '">' +
-            escapeHtml(action.label) +
+            '"' +
+            reveal +
+            ">" +
+            renderButtonContent(action) +
             "</span>"
           );
         }
         return (
-          '<button type="button" class="button" data-action-key="' +
+          '<button type="button" class="button reveal-item" data-action-key="' +
           escapeHtml(action.key) +
           '" data-card-action="copy" data-copy-label="' +
           escapeAttribute(action.label) +
           '" data-copy-value="' +
           escapeAttribute(action.value) +
-          '">' +
-          escapeHtml(action.label) +
+          '"' +
+          reveal +
+          ">" +
+          renderButtonContent(action) +
           "</button>"
         );
       })
@@ -728,8 +822,9 @@
     }
 
     return cards
-      .map(function (card) {
+      .map(function (card, index) {
         var link = trimString(card.url);
+        var reveal = revealStyle(index, 0.58);
         var content =
           '<p class="eyebrow">' +
           escapeHtml(card.eyebrow) +
@@ -742,11 +837,19 @@
           "</p>";
 
         if (!link) {
-          return '<article class="resource-card">' + content + "</article>";
+          return (
+            '<article class="resource-card reveal-item"' +
+            reveal +
+            ">" +
+            content +
+            "</article>"
+          );
         }
 
         return (
-          '<article class="resource-card">' +
+          '<article class="resource-card reveal-item"' +
+          reveal +
+          ">" +
           content +
           '<a class="resource-card__link" href="' +
           escapeHtml(normaliseUrl(link)) +
@@ -785,6 +888,8 @@
     var interactive = settings.interactive !== false;
     var showAlternative = Boolean(settings.showAlternative);
     var currentLine = activePositioning(config);
+    var nameLines = splitNameLines(config.profile.name);
+    var titleLines = splitTitleLines(config.profile.title);
     var alternativeLine =
       config.profile.positioning.active === "primary"
         ? config.profile.positioning.alternative
@@ -801,27 +906,31 @@
       '" data-motion="' +
       escapeHtml(config.layout.animationIntensity) +
       '">' +
-      renderMesh(config.layout.backgroundMotif) +
       '<div class="hero-card__topline">' +
       '<p class="eyebrow">' +
       escapeHtml(settings.heading || "Digital contact card") +
       "</p>" +
-      '<p class="micro-note">Static, mobile-first and Cloudflare-ready</p>' +
       "</div>" +
-      '<div class="hero-card__body">' +
-      '<div class="avatar-orb" aria-hidden="true"><span>' +
-      escapeHtml(config.profile.initials) +
-      "</span></div>" +
-      '<div class="identity-copy">' +
-      '<p class="identity-copy__institution">' +
+      '<article class="reference-hero" aria-label="Canva-inspired digital business card composition">' +
+      '<div class="reference-hero__name-block">' +
+      '<h1 class="reference-hero__name">' +
+      renderLineSpans(nameLines, "reference-hero__name-line") +
+      "</h1>" +
+      "</div>" +
+      '<div class="reference-orbit" aria-hidden="true">' +
+      '<div class="reference-orbit__system">' +
+      '<span class="reference-orbit__line"></span>' +
+      '<span class="reference-orbit__circle reference-orbit__circle--rear"></span>' +
+      '<span class="reference-orbit__circle reference-orbit__circle--front"></span>' +
+      "</div>" +
+      "</div>" +
+      '<p class="reference-hero__title">' +
+      renderLineSpans(titleLines, "reference-hero__title-line") +
+      "</p>" +
+      '<p class="reference-hero__institution">' +
       escapeHtml(config.profile.institution) +
       "</p>" +
-      "<h1>" +
-      escapeHtml(config.profile.name) +
-      "</h1>" +
-      '<p class="identity-copy__title">' +
-      escapeHtml(config.profile.title) +
-      "</p>" +
+      '<div class="reference-hero__support">' +
       '<p class="identity-copy__keywords">' +
       escapeHtml(config.profile.keywords.join(" · ")) +
       "</p>" +
@@ -834,8 +943,16 @@
           "</p>"
         : "") +
       "</div>" +
+      "</article>" +
+      "</section>" +
+      '<section class="action-panel">' +
+      '<div class="scroll-transition-line" aria-hidden="true"></div>' +
+      '<div class="action-panel__intro reveal-item" style="--reveal-delay: 0.04">' +
+      '<p class="eyebrow">Next steps</p>' +
+      "<h2>Save the details or go deeper</h2>" +
+      '<p class="micro-note">A lightweight contact page for CV access, public links and shareable details.</p>' +
       "</div>" +
-      '<div class="action-group">' +
+      '<div class="action-group reveal-group">' +
       '<div class="action-grid action-grid--primary">' +
       renderButtons(primaryActions(config), interactive) +
       "</div>" +
@@ -845,7 +962,7 @@
           "</div>"
         : "") +
       (interactive
-        ? '<p class="fallback-note">Fallback contact file: <a class="text-link" href="' +
+        ? '<p class="fallback-note reveal-item" style="--reveal-delay: 0.54">Fallback contact file: <a class="text-link" href="' +
           escapeHtml(config.links.staticVCardUrl || "assets/jack-tinsley.vcf") +
           '" download="jack-tinsley.vcf">Open static .vcf</a></p>' +
           '<div class="manual-copy-panel" id="manual-copy-panel" hidden>' +
@@ -857,10 +974,10 @@
       "</div>" +
       "</section>" +
       '<section class="resource-panel">' +
-      '<div class="resource-panel__intro">' +
+      '<div class="resource-panel__intro reveal-item" style="--reveal-delay: 0.50">' +
       '<p class="eyebrow">Selected pathways</p>' +
-      "<h2>Work, writing and practical context</h2>" +
-      '<p class="micro-note">The page stays clean by hiding anything without a live public link.</p>' +
+      "<h2>Work, writing and context</h2>" +
+      '<p class="micro-note">Only public links with configured destinations appear on the live page.</p>' +
       "</div>" +
       '<div class="resource-grid">' +
       renderResources(config, Boolean(settings.previewMode)) +
@@ -884,6 +1001,7 @@
 
     if (interactive) {
       attachInteractiveActions(root, config);
+      bindOrbitMotion(root);
     }
   }
 
@@ -963,6 +1081,64 @@
         hideManualCopy(root);
       }
     });
+  }
+
+  function bindOrbitMotion(root) {
+    var pageShell = root.querySelector(".page-shell-card");
+    var heroCard = root.querySelector(".hero-card");
+    var actionPanel = root.querySelector(".action-panel");
+
+    if (!pageShell || !heroCard || !actionPanel || !window.requestAnimationFrame) {
+      return;
+    }
+
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      pageShell.style.setProperty("--orbit-progress", "1");
+      pageShell.style.setProperty("--reveal-progress", "1");
+      pageShell.setAttribute("data-orbit", "engaged");
+      return;
+    }
+
+    var ticking = false;
+    pageShell.setAttribute("data-scroll-bound", "true");
+
+    function clamp(value) {
+      return Math.max(0, Math.min(1, value));
+    }
+
+    function smoothstep(value) {
+      var clamped = clamp(value);
+      return clamped * clamped * (3 - 2 * clamped);
+    }
+
+    function updateProgress() {
+      var heroRect = heroCard.getBoundingClientRect();
+      var actionRect = actionPanel.getBoundingClientRect();
+      var viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
+      var heroTravel = Math.max(1, heroCard.offsetHeight * 0.82);
+      var rawOrbit = -heroRect.top / heroTravel;
+      var rawReveal =
+        (viewportHeight * 0.82 - actionRect.top) / Math.max(1, viewportHeight * 0.44);
+      var orbitProgress = smoothstep(rawOrbit);
+      var revealProgress = smoothstep(rawReveal);
+
+      pageShell.style.setProperty("--orbit-progress", orbitProgress.toFixed(4));
+      pageShell.style.setProperty("--reveal-progress", revealProgress.toFixed(4));
+      pageShell.setAttribute("data-orbit", orbitProgress > 0.08 ? "engaged" : "rest");
+      ticking = false;
+    }
+
+    function queueUpdate() {
+      if (ticking) {
+        return;
+      }
+      ticking = true;
+      window.requestAnimationFrame(updateProgress);
+    }
+
+    queueUpdate();
+    window.addEventListener("scroll", queueUpdate, { passive: true });
+    window.addEventListener("resize", queueUpdate);
   }
 
   function initPublicPage() {
