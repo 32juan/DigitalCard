@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Jack Tinsley | Card Preview</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="config.js"></script>
+    <script src="script.js" defer></script>
+    <script src="card-preview.js" defer></script>
+  </head>
+  <body data-page="card-preview">
+    <main class="workspace-shell">
+      <header class="workspace-header">
+        <div>
+          <p class="eyebrow">Design sandbox</p>
+          <h1>Physical business card preview</h1>
+        </div>
+        <div class="workspace-links">
+          <a class="text-link" href="index.html" target="_blank" rel="noopener"
+            >Open public page</a
+          >
+          <a class="text-link" href="editor.html" target="_blank" rel="noopener"
+            >Open editor</a
+          >
+        </div>
+      </header>
+
+      <section class="instruction-card">
+        <p class="instruction-card__title">Print reminder</p>
+        <p>
+          The preview uses a placeholder QR graphic. Deploy the site first,
+          confirm the permanent URL, then replace <code>assets/qr-code.svg</code>
+          before ordering physical cards.
+        </p>
+      </section>
+
+      <div class="workspace-grid workspace-grid--preview">
+        <section class="control-panel">
+          <section class="form-section">
+            <div class="form-section__heading">
+              <h2>Preview controls</h2>
+              <p>Guides are for checking print safety and are not included in exports.</p>
+            </div>
+            <div class="field-grid">
+              <label class="field">
+                <span>Layout variant</span>
+                <select id="preview-layout">
+                  <option value="minimal-left">minimal-left</option>
+                  <option value="network-right">network-right</option>
+                  <option value="centred-premium">centred-premium</option>
+                  <option value="dark-reverse">dark-reverse</option>
+                  <option value="high-contrast-qr">high-contrast-qr</option>
+                </select>
+              </label>
+            </div>
+            <div class="toggle-grid">
+              <label class="toggle">
+                <input type="checkbox" id="guide-bleed" checked />
+                <span>3mm bleed</span>
+              </label>
+              <label class="toggle">
+                <input type="checkbox" id="guide-safe" checked />
+                <span>Safe area</span>
+              </label>
+              <label class="toggle">
+                <input type="checkbox" id="guide-centre" />
+                <span>Centre lines</span>
+              </label>
+              <label class="toggle">
+                <input type="checkbox" id="guide-qr" checked />
+                <span>QR safe area</span>
+              </label>
+            </div>
+          </section>
+
+          <div class="toolbar toolbar--stack">
+            <button type="button" class="button button--solid" id="export-front">
+              Export front SVG
+            </button>
+            <button type="button" class="button button--solid" id="export-back">
+              Export back SVG
+            </button>
+          </div>
+
+          <p class="form-note" id="preview-status" aria-live="polite">
+            Previewing the current config. If you opened this page from the editor,
+            your browser draft is used.
+          </p>
+        </section>
+
+        <section class="preview-panel">
+          <div class="preview-panel__card">
+            <div class="preview-panel__header">
+              <h2>Front of card</h2>
+              <p>85mm × 55mm reference ratio</p>
+            </div>
+            <div id="front-card-preview" class="print-card-shell"></div>
+          </div>
+
+          <div class="preview-panel__card">
+            <div class="preview-panel__header">
+              <h2>Back of card</h2>
+              <p>Keep the QR area high contrast and uncluttered.</p>
+            </div>
+            <div id="back-card-preview" class="print-card-shell"></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </body>
+</html>
