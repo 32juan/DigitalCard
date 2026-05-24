@@ -20,7 +20,7 @@ window.CARD_CONFIG = {
     linkedIn: "www.linkedin.com/in/jacktinsle"
   },
   links: {
-    publicUrl: "",
+    publicUrl: "https://32juan.github.io/DigitalCard/",
     cvUrl: "assets/jack-tinsley-cv.pdf",
     portfolioUrl: "",
     researchUrl: "",
