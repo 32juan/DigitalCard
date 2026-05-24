@@ -20,7 +20,7 @@ test.describe("public digital card", () => {
 
     await expect(page.getByRole("heading", { name: "Jack Tinsley" })).toBeVisible();
     await expect(page.getByText("Interdisciplinary Practitioner")).toBeVisible();
-    await expect(page.getByText("Problem Solving · Adaptability · Efficiency")).toBeVisible();
+    await expect(page.getByText("Problem Solving · Adaptability · Efficiency")).toHaveCount(0);
 
     const cvButton = page.locator('[data-action-key="viewCv"]');
     await expect(cvButton).toBeVisible();
@@ -128,7 +128,7 @@ test.describe("public digital card", () => {
     }
   });
 
-  test("desktop layout keeps the card intentional without excessive stretching", async ({
+  test("desktop layout uses the immersive shell without horizontal scroll", async ({
     page
   }, testInfo) => {
     test.skip(
@@ -140,8 +140,11 @@ test.describe("public digital card", () => {
 
     await assertNoHorizontalScroll(page, expect);
     const shellBox = await page.locator(".page-shell-card").boundingBox();
+    const viewport = page.viewportSize();
     expect(shellBox).not.toBeNull();
-    expect(shellBox.width).toBeLessThanOrEqual(1250);
+    expect(viewport).not.toBeNull();
+    expect(shellBox.width).toBeGreaterThanOrEqual(viewport.width - 1);
+    expect(shellBox.width).toBeLessThanOrEqual(viewport.width + 1);
 
     await expect(page.locator(".resource-grid")).toBeVisible();
     await expect(page.locator(".site-footer")).toContainText("No tracking. No cookies. Static page only.");

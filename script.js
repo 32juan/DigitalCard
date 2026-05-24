@@ -886,14 +886,8 @@
   function renderHome(root, config, options) {
     var settings = options || {};
     var interactive = settings.interactive !== false;
-    var showAlternative = Boolean(settings.showAlternative);
-    var currentLine = activePositioning(config);
     var nameLines = splitNameLines(config.profile.name);
     var titleLines = splitTitleLines(config.profile.title);
-    var alternativeLine =
-      config.profile.positioning.active === "primary"
-        ? config.profile.positioning.alternative
-        : config.profile.positioning.primary;
 
     applyTheme(config, root);
 
@@ -906,11 +900,6 @@
       '" data-motion="' +
       escapeHtml(config.layout.animationIntensity) +
       '">' +
-      '<div class="hero-card__topline">' +
-      '<p class="eyebrow">' +
-      escapeHtml(settings.heading || "Digital contact card") +
-      "</p>" +
-      "</div>" +
       '<article class="reference-hero" aria-label="Canva-inspired digital business card composition">' +
       '<div class="reference-hero__name-block">' +
       '<h1 class="reference-hero__name">' +
@@ -927,30 +916,15 @@
       '<p class="reference-hero__title">' +
       renderLineSpans(titleLines, "reference-hero__title-line") +
       "</p>" +
-      '<p class="reference-hero__institution">' +
-      escapeHtml(config.profile.institution) +
-      "</p>" +
-      '<div class="reference-hero__support">' +
-      '<p class="identity-copy__keywords">' +
-      escapeHtml(config.profile.keywords.join(" · ")) +
-      "</p>" +
-      '<p class="identity-copy__positioning">' +
-      escapeHtml(currentLine) +
-      "</p>" +
-      (showAlternative && alternativeLine
-        ? '<p class="identity-copy__alternative">Alternative line: ' +
-          escapeHtml(alternativeLine) +
-          "</p>"
-        : "") +
-      "</div>" +
       "</article>" +
       "</section>" +
+      '<section class="content-flow">' +
+      '<div class="content-flow__inner">' +
       '<section class="action-panel">' +
       '<div class="scroll-transition-line" aria-hidden="true"></div>' +
       '<div class="action-panel__intro reveal-item" style="--reveal-delay: 0.04">' +
       '<p class="eyebrow">Next steps</p>' +
       "<h2>Save the details or go deeper</h2>" +
-      '<p class="micro-note">A lightweight contact page for CV access, public links and shareable details.</p>' +
       "</div>" +
       '<div class="action-group reveal-group">' +
       '<div class="action-grid action-grid--primary">' +
@@ -977,7 +951,6 @@
       '<div class="resource-panel__intro reveal-item" style="--reveal-delay: 0.50">' +
       '<p class="eyebrow">Selected pathways</p>' +
       "<h2>Work, writing and context</h2>" +
-      '<p class="micro-note">Only public links with configured destinations appear on the live page.</p>' +
       "</div>" +
       '<div class="resource-grid">' +
       renderResources(config, Boolean(settings.previewMode)) +
@@ -997,6 +970,8 @@
       (interactive
         ? '<div class="status-pill" id="page-status" role="status" aria-live="polite">Ready to share.</div>'
         : "") +
+      "</div>" +
+      "</section>" +
       "</div>";
 
     if (interactive) {
@@ -1095,6 +1070,7 @@
     if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       pageShell.style.setProperty("--orbit-progress", "1");
       pageShell.style.setProperty("--reveal-progress", "1");
+      pageShell.style.setProperty("--zoom-progress", "1");
       pageShell.setAttribute("data-orbit", "engaged");
       return;
     }
@@ -1121,9 +1097,11 @@
         (viewportHeight * 0.82 - actionRect.top) / Math.max(1, viewportHeight * 0.44);
       var orbitProgress = smoothstep(rawOrbit);
       var revealProgress = smoothstep(rawReveal);
+      var zoomProgress = smoothstep((rawOrbit - 0.08) / 0.82);
 
       pageShell.style.setProperty("--orbit-progress", orbitProgress.toFixed(4));
       pageShell.style.setProperty("--reveal-progress", revealProgress.toFixed(4));
+      pageShell.style.setProperty("--zoom-progress", zoomProgress.toFixed(4));
       pageShell.setAttribute("data-orbit", orbitProgress > 0.08 ? "engaged" : "rest");
       ticking = false;
     }
