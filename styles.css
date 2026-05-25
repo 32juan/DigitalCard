@@ -38,6 +38,11 @@ html {
   color-scheme: light;
 }
 
+html.public-scroll-snap {
+  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -54,6 +59,7 @@ body {
 
 body[data-page="public"] {
   background: var(--tone-paper);
+  overscroll-behavior-y: contain;
 }
 
 img,
@@ -175,6 +181,8 @@ body[data-page="public"] .hero-card {
   background: transparent;
   box-shadow: none;
   backdrop-filter: none;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 .hero-card::before {
@@ -728,6 +736,8 @@ body[data-page="public"] .content-flow {
   min-height: 100svh;
   background: var(--tone-rear);
   color: #fff8ef;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 body[data-page="public"] .action-panel {
@@ -1671,5 +1681,10 @@ body[data-page="public"] .status-pill {
     --orbit-progress: 1 !important;
     --reveal-progress: 1 !important;
     --zoom-progress: 1 !important;
+  }
+
+  html.public-scroll-snap {
+    scroll-behavior: auto;
+    scroll-snap-type: none;
   }
 }

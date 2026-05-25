@@ -145,6 +145,9 @@ test.describe("public digital card", () => {
     expect(viewport).not.toBeNull();
     expect(shellBox.width).toBeGreaterThanOrEqual(viewport.width - 1);
     expect(shellBox.width).toBeLessThanOrEqual(viewport.width + 1);
+    await expect(page.locator("html")).toHaveClass(/public-scroll-snap/);
+    await expect(page.locator(".hero-card")).toHaveCSS("scroll-snap-align", "start");
+    await expect(page.locator(".content-flow")).toHaveCSS("scroll-snap-align", "start");
 
     await expect(page.locator(".resource-grid")).toBeVisible();
     await expect(page.locator(".site-footer")).toContainText("No tracking. No cookies. Static page only.");

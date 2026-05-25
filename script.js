@@ -1124,6 +1124,7 @@
     if (!root) {
       return;
     }
+    document.documentElement.classList.add("public-scroll-snap");
     applyTheme(getBaseConfig(), document.documentElement);
     renderHome(root, getBaseConfig(), {
       interactive: true,
