@@ -923,8 +923,7 @@
       '<section class="action-panel">' +
       '<div class="scroll-transition-line" aria-hidden="true"></div>' +
       '<div class="action-panel__intro reveal-item" style="--reveal-delay: 0.04">' +
-      '<p class="eyebrow">Next steps</p>' +
-      "<h2>Save the details or go deeper</h2>" +
+      "<h2>Save my details</h2>" +
       "</div>" +
       '<div class="action-group reveal-group">' +
       '<div class="action-grid action-grid--primary">' +
@@ -936,10 +935,7 @@
           "</div>"
         : "") +
       (interactive
-        ? '<p class="fallback-note reveal-item" style="--reveal-delay: 0.54">Fallback contact file: <a class="text-link" href="' +
-          escapeHtml(config.links.staticVCardUrl || "assets/jack-tinsley.vcf") +
-          '" download="jack-tinsley.vcf">Open static .vcf</a></p>' +
-          '<div class="manual-copy-panel" id="manual-copy-panel" hidden>' +
+        ? '<div class="manual-copy-panel" id="manual-copy-panel" hidden>' +
           '<p class="micro-note" id="manual-copy-label">Copy this value manually.</p>' +
           '<textarea class="manual-copy-panel__value" id="manual-copy-value" aria-labelledby="manual-copy-label" readonly></textarea>' +
           '<button type="button" class="button" data-card-action="close-manual-copy">Close</button>' +
@@ -949,8 +945,7 @@
       "</section>" +
       '<section class="resource-panel">' +
       '<div class="resource-panel__intro reveal-item" style="--reveal-delay: 0.50">' +
-      '<p class="eyebrow">Selected pathways</p>' +
-      "<h2>Work, writing and context</h2>" +
+      "<h2>Other work</h2>" +
       "</div>" +
       '<div class="resource-grid">' +
       renderResources(config, Boolean(settings.previewMode)) +

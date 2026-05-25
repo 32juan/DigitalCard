@@ -20,7 +20,11 @@ test.describe("public digital card", () => {
 
     await expect(page.getByRole("heading", { name: "Jack Tinsley" })).toBeVisible();
     await expect(page.getByText("Interdisciplinary Practitioner")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Save my details" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Other work" })).toBeVisible();
     await expect(page.getByText("Problem Solving · Adaptability · Efficiency")).toHaveCount(0);
+    await expect(page.getByText("Next steps")).toHaveCount(0);
+    await expect(page.getByText("Fallback contact file")).toHaveCount(0);
 
     const cvButton = page.locator('[data-action-key="viewCv"]');
     await expect(cvButton).toBeVisible();
