@@ -43,6 +43,10 @@ html.public-scroll-snap {
   scroll-snap-type: y mandatory;
 }
 
+html.public-scroll-snap body {
+  scroll-snap-type: y mandatory;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -121,6 +125,8 @@ body[data-page="public"] .app-shell {
   --orbit-progress: 0;
   --reveal-progress: 1;
   --zoom-progress: 0;
+  --zoom-origin-x: calc(50% + 14vw);
+  --zoom-origin-y: calc(54svh - 4rem);
   position: relative;
   display: grid;
   gap: clamp(1rem, 2vw, 1.35rem);
@@ -140,13 +146,19 @@ body[data-page="public"] .page-shell-card {
 body[data-page="public"] .page-shell-card::before {
   content: "";
   position: fixed;
-  left: 61%;
-  top: 40%;
+  left: var(--zoom-origin-x);
+  top: var(--zoom-origin-y);
   z-index: 0;
   width: clamp(9rem, 17vw, 13rem);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: var(--tone-rear);
+  background: radial-gradient(
+    circle,
+    var(--tone-rear) 0 68%,
+    rgba(106, 56, 13, 0.94) 76%,
+    rgba(106, 56, 13, 0.46) 90%,
+    rgba(106, 56, 13, 0) 100%
+  );
   opacity: calc(var(--zoom-progress) * 0.98);
   transform: translate(-50%, -50%)
     scale(calc(1 + var(--zoom-progress) * 22));
@@ -174,6 +186,7 @@ body[data-page="public"] .page-shell-card::before {
 }
 
 body[data-page="public"] .hero-card {
+  z-index: 3;
   min-height: 100svh;
   padding: clamp(1.4rem, 5vw, 4.8rem);
   border: 0;
@@ -326,7 +339,7 @@ body[data-page="public"] .reference-hero {
 body[data-page="public"] .reference-hero__name {
   font-family: "Inter", var(--font-display);
   font-size: clamp(4.45rem, 16vw, 11.4rem);
-  font-weight: 760;
+  font-weight: 690;
   line-height: 0.78;
   letter-spacing: 0;
 }
@@ -338,6 +351,18 @@ body[data-page="public"] .reference-hero__name-line:first-child {
 body[data-page="public"] .reference-hero__name-line:last-child {
   color: var(--tone-bronze);
   margin-top: -0.08em;
+  transform: translateX(-0.3em);
+}
+
+body[data-page="public"] .reference-hero__name-block,
+body[data-page="public"] .reference-hero__title {
+  opacity: calc(1 - var(--zoom-progress));
+  transform: translateY(calc(var(--orbit-progress) * -1.8rem));
+}
+
+body[data-page="public"] .page-shell-card[data-zoom="covered"] .reference-hero__name-block,
+body[data-page="public"] .page-shell-card[data-zoom="covered"] .reference-hero__title {
+  visibility: hidden;
 }
 
 .reference-hero__name-line,
@@ -374,9 +399,9 @@ body[data-page="public"] .reference-orbit {
 
 body[data-page="public"] .reference-orbit__system {
   position: fixed;
-  left: calc(50% + clamp(0.65rem, 4vw, 4rem));
+  left: calc(50% + clamp(5rem, 24vw, 15rem));
   top: 54svh;
-  z-index: 3;
+  z-index: 6;
   width: clamp(11rem, 24vw, 18rem);
   pointer-events: none;
   transform: translate(-50%, -50%)
@@ -387,8 +412,8 @@ body[data-page="public"] .reference-orbit__system {
 .reference-orbit__line {
   position: absolute;
   z-index: 2;
-  top: 50%;
-  right: 50%;
+  top: 25%;
+  right: 52%;
   width: min(25rem, 58vw);
   height: 2px;
   border-radius: 999px;
@@ -402,7 +427,7 @@ body[data-page="public"] .reference-orbit__system {
 
 body[data-page="public"] .reference-orbit__line {
   background: var(--tone-line);
-  transform: scaleX(calc(1 - var(--orbit-progress) * 0.04));
+  transform: scaleX(calc(1 - var(--orbit-progress) * 0.78));
 }
 
 .reference-orbit__circle {
@@ -436,7 +461,7 @@ body[data-page="public"] .reference-orbit__circle--front {
       calc(var(--orbit-progress) * 0.08rem),
       0
     )
-    scale(calc(1 - var(--orbit-progress) * 0.03));
+    scale(calc(1 - var(--orbit-progress) * 0.54));
 }
 
 .reference-orbit__circle--rear {
@@ -740,7 +765,7 @@ body[data-page="public"] .reference-hero__title {
   z-index: 2;
   width: min(100% - 2rem, var(--site-width));
   margin: 0 auto;
-  padding: clamp(4.5rem, 12vw, 8rem) 0 3rem;
+  padding: clamp(3.2rem, 8vw, 5.6rem) 0 3rem;
 }
 
 body[data-page="public"] .content-flow {
@@ -750,6 +775,23 @@ body[data-page="public"] .content-flow {
   color: #fff8ef;
   scroll-snap-align: start;
   scroll-snap-stop: always;
+}
+
+body[data-page="public"] .content-flow::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -36svh;
+  z-index: 0;
+  height: 36svh;
+  background: linear-gradient(
+    180deg,
+    rgba(106, 56, 13, 0),
+    rgba(106, 56, 13, 0.5) 55%,
+    var(--tone-rear)
+  );
+  pointer-events: none;
 }
 
 body[data-page="public"] .action-panel {
@@ -802,12 +844,7 @@ body[data-page="public"] .micro-note {
 }
 
 body[data-page="public"] .scroll-transition-line {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 248, 239, 0.74),
-    rgba(255, 248, 239, 0.18),
-    transparent
-  );
+  display: none;
 }
 
 .orbital-transition {
@@ -1122,7 +1159,8 @@ body[data-page="public"] .resource-grid {
 
 body[data-page="public"] .resource-card {
   gap: 0.7rem;
-  padding: clamp(1.05rem, 2vw, 1.35rem) 0;
+  padding: clamp(1.05rem, 2vw, 1.35rem) clamp(5.6rem, 18vw, 14rem)
+    clamp(1.05rem, 2vw, 1.35rem) 0;
   border: 0;
   border-top: 1px solid rgba(255, 248, 239, 0.2);
   border-radius: 0;
@@ -1636,6 +1674,10 @@ body[data-page="public"] .status-pill {
     font-size: clamp(3.55rem, 17vw, 4.6rem);
   }
 
+  body[data-page="public"] .reference-hero__name-line:last-child {
+    transform: translateX(-0.3em);
+  }
+
   .reference-orbit {
     height: 11.2rem;
   }
@@ -1649,8 +1691,25 @@ body[data-page="public"] .status-pill {
     width: min(15rem, 58vw);
   }
 
+  body[data-page="public"] .reference-orbit__circle--front {
+    transform: translate3d(
+        calc(var(--orbit-progress) * -0.18rem),
+        calc(var(--orbit-progress) * 0.08rem),
+        0
+      )
+      scale(calc(1 - var(--orbit-progress) * 0.6));
+  }
+
   .reference-hero__title {
     font-size: clamp(1.25rem, 6.1vw, 1.72rem);
+  }
+
+  body[data-page="public"] .content-flow__inner {
+    padding-top: clamp(3rem, 10vw, 3.8rem);
+  }
+
+  body[data-page="public"] .resource-card {
+    padding-right: clamp(7rem, 31vw, 7.8rem);
   }
 
   .signature-card__surface {
@@ -1690,12 +1749,17 @@ body[data-page="public"] .status-pill {
   }
 
   .page-shell-card {
-    --orbit-progress: 1 !important;
+    --orbit-progress: 0 !important;
     --reveal-progress: 1 !important;
-    --zoom-progress: 1 !important;
+    --zoom-progress: 0 !important;
   }
 
-  html.public-scroll-snap {
+  body[data-page="public"] .page-shell-card::before {
+    display: none;
+  }
+
+  html.public-scroll-snap,
+  html.public-scroll-snap body {
     scroll-behavior: auto;
     scroll-snap-type: none;
   }

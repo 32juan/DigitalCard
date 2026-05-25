@@ -1056,7 +1056,9 @@
   function bindOrbitMotion(root) {
     var pageShell = root.querySelector(".page-shell-card");
     var heroCard = root.querySelector(".hero-card");
+    var referenceHero = root.querySelector(".reference-hero");
     var actionPanel = root.querySelector(".action-panel");
+    var zoomOrigin = root.querySelector(".reference-orbit__circle--rear");
 
     if (!pageShell || !heroCard || !actionPanel || !window.requestAnimationFrame) {
       return;
@@ -1097,7 +1099,28 @@
       pageShell.style.setProperty("--orbit-progress", orbitProgress.toFixed(4));
       pageShell.style.setProperty("--reveal-progress", revealProgress.toFixed(4));
       pageShell.style.setProperty("--zoom-progress", zoomProgress.toFixed(4));
+
+      if (zoomOrigin) {
+        var originRect = zoomOrigin.getBoundingClientRect();
+        pageShell.style.setProperty(
+          "--zoom-origin-x",
+          (originRect.left + originRect.width / 2).toFixed(2) + "px"
+        );
+        pageShell.style.setProperty(
+          "--zoom-origin-y",
+          (originRect.top + originRect.height / 2).toFixed(2) + "px"
+        );
+      }
+
       pageShell.setAttribute("data-orbit", orbitProgress > 0.08 ? "engaged" : "rest");
+      pageShell.setAttribute("data-zoom", zoomProgress > 0.64 ? "covered" : "open");
+      if (referenceHero) {
+        if (zoomProgress > 0.2) {
+          referenceHero.setAttribute("aria-hidden", "true");
+        } else {
+          referenceHero.removeAttribute("aria-hidden");
+        }
+      }
       ticking = false;
     }
 
