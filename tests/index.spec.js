@@ -25,6 +25,7 @@ test.describe("public digital card", () => {
     await expect(page.getByText("Problem Solving · Adaptability · Efficiency")).toHaveCount(0);
     await expect(page.getByText("Next steps")).toHaveCount(0);
     await expect(page.getByText("Fallback contact file")).toHaveCount(0);
+    await expect(page.getByText("Ready to share.")).toBeHidden();
 
     const cvButton = page.locator('[data-action-key="viewCv"]');
     await expect(cvButton).toBeVisible();
@@ -154,6 +155,6 @@ test.describe("public digital card", () => {
     await expect(page.locator(".content-flow")).toHaveCSS("scroll-snap-align", "start");
 
     await expect(page.locator(".resource-grid")).toBeVisible();
-    await expect(page.locator(".site-footer")).toContainText("No tracking. No cookies. Static page only.");
+    await expect(page.locator(".site-footer")).toHaveCount(0);
   });
 });

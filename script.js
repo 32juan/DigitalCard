@@ -951,19 +951,21 @@
       renderResources(config, Boolean(settings.previewMode)) +
       "</div>" +
       "</section>" +
-      '<footer class="site-footer">' +
-      "<p><strong>" +
-      escapeHtml(config.profile.name) +
-      "</strong></p>" +
-      "<p>Digital card last updated: " +
-      escapeHtml(formatDate(config.meta.lastUpdated)) +
-      "</p>" +
-      "<p>" +
-      escapeHtml(config.meta.privacyNote) +
-      "</p>" +
-      "</footer>" +
+      (settings.showFooter === false
+        ? ""
+        : '<footer class="site-footer">' +
+          "<p><strong>" +
+          escapeHtml(config.profile.name) +
+          "</strong></p>" +
+          "<p>Digital card last updated: " +
+          escapeHtml(formatDate(config.meta.lastUpdated)) +
+          "</p>" +
+          "<p>" +
+          escapeHtml(config.meta.privacyNote) +
+          "</p>" +
+          "</footer>") +
       (interactive
-        ? '<div class="status-pill" id="page-status" role="status" aria-live="polite">Ready to share.</div>'
+        ? '<div class="status-pill" id="page-status" role="status" aria-live="polite" hidden>Ready to share.</div>'
         : "") +
       "</div>" +
       "</section>" +
@@ -979,6 +981,7 @@
     var status = root.querySelector("#page-status");
     if (status) {
       status.textContent = message;
+      status.hidden = false;
     }
   }
 
@@ -1147,7 +1150,8 @@
     renderHome(root, getBaseConfig(), {
       interactive: true,
       showAlternative: false,
-      previewMode: false
+      previewMode: false,
+      showFooter: false
     });
   }
 
