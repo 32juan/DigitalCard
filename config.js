@@ -45,9 +45,9 @@ window.CARD_CONFIG = {
   sections: {
     cards: {
       cvProfile: {
-        title: "CV / Risk & Operations Profile",
+        title: "Risk & Operations Profile",
         description:
-          "A concise profile for opportunities in risk, operations, security and interdisciplinary problem-solving.",
+          "A concise profile for risk, operations and practical interdisciplinary problem-solving.",
         url: "assets/jack-tinsley-cv.pdf",
         visible: true
       },
@@ -76,18 +76,18 @@ window.CARD_CONFIG = {
   theme: {
     colors: {
       background: "#f5f1e9",
-      surface: "rgba(255, 253, 248, 0.82)",
-      surfaceStrong: "#fffdf9",
-      text: "#171615",
-      muted: "#5c5751",
-      border: "#dad1c5",
-      shadow: "rgba(20, 20, 20, 0.12)"
+      surface: "rgba(255, 250, 242, 0.86)",
+      surfaceStrong: "#fff8ef",
+      text: "#563211",
+      muted: "#765536",
+      border: "#cdbba5",
+      shadow: "rgba(86, 50, 17, 0.12)"
     },
     accents: {
-      blue: "#6692ff",
-      green: "#7cd1a2",
-      pink: "#f09fc6",
-      yellow: "#f2cb72"
+      blue: "#9a5f24",
+      green: "#7b4517",
+      pink: "#c18345",
+      yellow: "#e2ba82"
     },
     typographyScale: {
       display: "clamp(2.4rem, 7vw, 4rem)",
@@ -98,7 +98,7 @@ window.CARD_CONFIG = {
   },
   layout: {
     digitalCardVariant: "stacked-premium",
-    backgroundMotif: "nodes-soft",
+    backgroundMotif: "card-circles",
     animationIntensity: "low",
     physicalCardVariant: "centred-premium"
   },

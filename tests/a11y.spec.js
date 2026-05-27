@@ -19,7 +19,7 @@ test.describe("accessibility basics", () => {
     await page.goto("/index.html");
 
     await expect(page.getByRole("button", { name: "Add to Contacts" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "View / Download CV" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "View CV" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Copy All Details" })).toBeVisible();
 
     await page.keyboard.press("Tab");

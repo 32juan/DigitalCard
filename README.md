@@ -215,7 +215,7 @@ How to test the vCard after deployment:
 
 How to test the CV after deployment:
 
-- Tap `View / Download CV` from the deployed page on desktop and mobile.
+- Tap `View CV` from the deployed page on desktop and mobile.
 - Confirm it points to the intended same-origin PDF.
 - Confirm the file opens without a 404 and is still readable after any CV replacement.
 

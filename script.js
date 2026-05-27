@@ -48,7 +48,7 @@
     sections: {
       cards: {
         cvProfile: {
-          title: "CV / Risk & Operations Profile",
+          title: "Risk & Operations Profile",
           description: "",
           url: "",
           visible: true
@@ -76,18 +76,18 @@
     theme: {
       colors: {
         background: "#f5f1e9",
-      surface: "rgba(255, 253, 248, 0.82)",
-      surfaceStrong: "#fffdf9",
-      text: "#171615",
-      muted: "#5c5751",
-      border: "#dad1c5",
-      shadow: "rgba(20, 20, 20, 0.12)"
+        surface: "rgba(255, 250, 242, 0.86)",
+        surfaceStrong: "#fff8ef",
+        text: "#563211",
+        muted: "#765536",
+        border: "#cdbba5",
+        shadow: "rgba(86, 50, 17, 0.12)"
       },
       accents: {
-        blue: "#6692ff",
-        green: "#7cd1a2",
-        pink: "#f09fc6",
-        yellow: "#f2cb72"
+        blue: "#9a5f24",
+        green: "#7b4517",
+        pink: "#c18345",
+        yellow: "#e2ba82"
       },
       typographyScale: {
         display: "clamp(2.4rem, 7vw, 4rem)",
@@ -98,7 +98,7 @@
     },
     layout: {
       digitalCardVariant: "stacked-premium",
-      backgroundMotif: "nodes-soft",
+      backgroundMotif: "card-circles",
       animationIntensity: "low",
       physicalCardVariant: "centred-premium"
     },
@@ -609,25 +609,25 @@
         key: "addToContacts",
         label: "Add to Contacts",
         action: "download-vcard",
-        variant: "ghost"
+        variant: "primary"
       },
       {
         key: "viewCv",
-        label: "View / Download CV",
+        label: "View CV",
         href: normaliseUrl(resolveLink(config, "cvUrl")),
-        variant: "primary"
+        variant: "secondary"
       },
       {
         key: "email",
         label: "Email Jack",
         href: "mailto:" + trimString(config.contact.email),
-        variant: "ghost"
+        variant: "secondary"
       },
       {
         key: "linkedIn",
         label: "LinkedIn",
         href: normaliseUrl(trimString(config.contact.linkedIn)),
-        variant: "ghost"
+        variant: "secondary"
       },
       {
         key: "portfolio",
@@ -785,7 +785,7 @@
         var reveal = revealStyle(index, 0.36);
         if (!interactive) {
           return (
-            '<span class="button reveal-item" data-action-key="' +
+            '<span class="button reveal-item" data-variant="utility" data-action-key="' +
             escapeHtml(action.key) +
             '"' +
             reveal +
@@ -795,7 +795,7 @@
           );
         }
         return (
-          '<button type="button" class="button reveal-item" data-action-key="' +
+          '<button type="button" class="button reveal-item" data-variant="utility" data-action-key="' +
           escapeHtml(action.key) +
           '" data-card-action="copy" data-copy-label="' +
           escapeAttribute(action.label) +
@@ -825,12 +825,16 @@
       .map(function (card, index) {
         var link = trimString(card.url);
         var reveal = revealStyle(index, 0.58);
+        var title = card.title || card.key;
+        if (card.key === "cvProfile") {
+          title = title.replace(/^CV\s*\/\s*/i, "");
+        }
         var content =
           '<p class="eyebrow">' +
           escapeHtml(card.eyebrow) +
           "</p>" +
           '<h3 class="resource-card__title">' +
-          escapeHtml(card.title || card.key) +
+          escapeHtml(title) +
           "</h3>" +
           '<p class="resource-card__description">' +
           escapeHtml(card.description || "") +
@@ -861,33 +865,12 @@
       .join("");
   }
 
-  function renderMesh(variant) {
-    return (
-      '<div class="hero-card__mesh" data-motif="' +
-      escapeHtml(variant) +
-      '" aria-hidden="true">' +
-      '<span class="mesh-line mesh-line--1"></span>' +
-      '<span class="mesh-line mesh-line--2"></span>' +
-      '<span class="mesh-line mesh-line--3"></span>' +
-      '<span class="mesh-line mesh-line--4"></span>' +
-      '<span class="mesh-line mesh-line--5"></span>' +
-      '<span class="mesh-node mesh-node--1 mesh-node--blue"></span>' +
-      '<span class="mesh-node mesh-node--2 mesh-node--green"></span>' +
-      '<span class="mesh-node mesh-node--3 mesh-node--pink"></span>' +
-      '<span class="mesh-node mesh-node--4 mesh-node--yellow"></span>' +
-      '<span class="mesh-node mesh-node--5 mesh-node--blue"></span>' +
-      '<span class="mesh-node mesh-node--6 mesh-node--green"></span>' +
-      '<span class="mesh-node mesh-node--7 mesh-node--pink"></span>' +
-      '<span class="mesh-node mesh-node--8 mesh-node--yellow"></span>' +
-      "</div>"
-    );
-  }
-
   function renderHome(root, config, options) {
     var settings = options || {};
     var interactive = settings.interactive !== false;
     var nameLines = splitNameLines(config.profile.name);
     var titleLines = splitTitleLines(config.profile.title);
+    var positioning = activePositioning(config);
 
     applyTheme(config, root);
 
@@ -900,12 +883,14 @@
       '" data-motion="' +
       escapeHtml(config.layout.animationIntensity) +
       '">' +
-      '<article class="reference-hero" aria-label="Canva-inspired digital business card composition">' +
-      '<div class="reference-hero__name-block">' +
-      '<h1 class="reference-hero__name">' +
+      '<div class="hero-card__inner">' +
+      '<div class="hero-card__identity">' +
+      '<h1 class="reference-hero__name" id="card-title">' +
       renderLineSpans(nameLines, "reference-hero__name-line") +
       "</h1>" +
+      '<span class="hero-card__rule" aria-hidden="true"></span>' +
       "</div>" +
+      '<div class="hero-card__details">' +
       '<div class="reference-orbit" aria-hidden="true">' +
       '<div class="reference-orbit__system">' +
       '<span class="reference-orbit__line"></span>' +
@@ -916,15 +901,7 @@
       '<p class="reference-hero__title">' +
       renderLineSpans(titleLines, "reference-hero__title-line") +
       "</p>" +
-      "</article>" +
-      "</section>" +
-      '<section class="content-flow">' +
-      '<div class="content-flow__inner">' +
-      '<section class="action-panel">' +
-      '<div class="scroll-transition-line" aria-hidden="true"></div>' +
-      '<div class="action-panel__intro reveal-item" style="--reveal-delay: 0.04">' +
-      "<h2>Save my details</h2>" +
-      "</div>" +
+      '<section class="action-panel" aria-label="Contact actions">' +
       '<div class="action-group reveal-group">' +
       '<div class="action-grid action-grid--primary">' +
       renderButtons(primaryActions(config), interactive) +
@@ -938,14 +915,28 @@
         ? '<div class="manual-copy-panel" id="manual-copy-panel" hidden>' +
           '<p class="micro-note" id="manual-copy-label">Copy this value manually.</p>' +
           '<textarea class="manual-copy-panel__value" id="manual-copy-value" aria-labelledby="manual-copy-label" readonly></textarea>' +
-          '<button type="button" class="button" data-card-action="close-manual-copy">Close</button>' +
+          '<button type="button" class="button" data-variant="utility" data-card-action="close-manual-copy">Close</button>' +
           "</div>"
         : "") +
+      (interactive
+        ? '<div class="status-pill" id="page-status" role="status" aria-live="polite" hidden>Ready.</div>'
+        : "") +
+      "</div>" +
+      "</section>" +
+      '<div class="hero-card__support">' +
+      (positioning
+        ? '<p class="hero-card__positioning">' + escapeHtml(positioning) + "</p>"
+        : "") +
+      (config.profile.institution
+        ? '<p class="hero-card__institution">' + escapeHtml(config.profile.institution) + "</p>"
+        : "") +
+      "</div>" +
+      "</div>" +
       "</div>" +
       "</section>" +
       '<section class="resource-panel">' +
       '<div class="resource-panel__intro reveal-item" style="--reveal-delay: 0.50">' +
-      "<h2>Other work</h2>" +
+      "<h2>Selected profile</h2>" +
       "</div>" +
       '<div class="resource-grid">' +
       renderResources(config, Boolean(settings.previewMode)) +
@@ -964,11 +955,6 @@
           escapeHtml(config.meta.privacyNote) +
           "</p>" +
           "</footer>") +
-      (interactive
-        ? '<div class="status-pill" id="page-status" role="status" aria-live="polite" hidden>Ready to share.</div>'
-        : "") +
-      "</div>" +
-      "</section>" +
       "</div>";
 
     if (interactive) {
@@ -1058,86 +1044,19 @@
 
   function bindOrbitMotion(root) {
     var pageShell = root.querySelector(".page-shell-card");
-    var heroCard = root.querySelector(".hero-card");
-    var referenceHero = root.querySelector(".reference-hero");
-    var actionPanel = root.querySelector(".action-panel");
-    var zoomOrigin = root.querySelector(".reference-orbit__circle--rear");
-
-    if (!pageShell || !heroCard || !actionPanel || !window.requestAnimationFrame) {
+    if (!pageShell) {
       return;
     }
+
+    pageShell.style.setProperty("--orbit-progress", "0");
+    pageShell.style.setProperty("--reveal-progress", "1");
+    pageShell.style.setProperty("--zoom-progress", "0");
 
     if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      pageShell.style.setProperty("--orbit-progress", "1");
-      pageShell.style.setProperty("--reveal-progress", "1");
-      pageShell.style.setProperty("--zoom-progress", "1");
-      pageShell.setAttribute("data-orbit", "engaged");
       return;
     }
 
-    var ticking = false;
-    pageShell.setAttribute("data-scroll-bound", "true");
-
-    function clamp(value) {
-      return Math.max(0, Math.min(1, value));
-    }
-
-    function smoothstep(value) {
-      var clamped = clamp(value);
-      return clamped * clamped * (3 - 2 * clamped);
-    }
-
-    function updateProgress() {
-      var heroRect = heroCard.getBoundingClientRect();
-      var actionRect = actionPanel.getBoundingClientRect();
-      var viewportHeight = window.innerHeight || document.documentElement.clientHeight || 1;
-      var heroTravel = Math.max(1, heroCard.offsetHeight * 0.82);
-      var rawOrbit = -heroRect.top / heroTravel;
-      var rawReveal =
-        (viewportHeight * 0.82 - actionRect.top) / Math.max(1, viewportHeight * 0.44);
-      var orbitProgress = smoothstep(rawOrbit);
-      var revealProgress = smoothstep(rawReveal);
-      var zoomProgress = smoothstep((rawOrbit - 0.08) / 0.82);
-
-      pageShell.style.setProperty("--orbit-progress", orbitProgress.toFixed(4));
-      pageShell.style.setProperty("--reveal-progress", revealProgress.toFixed(4));
-      pageShell.style.setProperty("--zoom-progress", zoomProgress.toFixed(4));
-
-      if (zoomOrigin) {
-        var originRect = zoomOrigin.getBoundingClientRect();
-        pageShell.style.setProperty(
-          "--zoom-origin-x",
-          (originRect.left + originRect.width / 2).toFixed(2) + "px"
-        );
-        pageShell.style.setProperty(
-          "--zoom-origin-y",
-          (originRect.top + originRect.height / 2).toFixed(2) + "px"
-        );
-      }
-
-      pageShell.setAttribute("data-orbit", orbitProgress > 0.08 ? "engaged" : "rest");
-      pageShell.setAttribute("data-zoom", zoomProgress > 0.64 ? "covered" : "open");
-      if (referenceHero) {
-        if (zoomProgress > 0.2) {
-          referenceHero.setAttribute("aria-hidden", "true");
-        } else {
-          referenceHero.removeAttribute("aria-hidden");
-        }
-      }
-      ticking = false;
-    }
-
-    function queueUpdate() {
-      if (ticking) {
-        return;
-      }
-      ticking = true;
-      window.requestAnimationFrame(updateProgress);
-    }
-
-    queueUpdate();
-    window.addEventListener("scroll", queueUpdate, { passive: true });
-    window.addEventListener("resize", queueUpdate);
+    pageShell.setAttribute("data-motion-ready", "true");
   }
 
   function initPublicPage() {
@@ -1145,13 +1064,12 @@
     if (!root) {
       return;
     }
-    document.documentElement.classList.add("public-scroll-snap");
+    document.documentElement.classList.remove("public-scroll-snap");
     applyTheme(getBaseConfig(), document.documentElement);
     renderHome(root, getBaseConfig(), {
       interactive: true,
       showAlternative: false,
-      previewMode: false,
-      showFooter: false
+      previewMode: false
     });
   }
 

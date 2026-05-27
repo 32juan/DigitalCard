@@ -12,7 +12,7 @@ const {
 const MOBILE_PROJECTS = new Set(["mobile-360", "mobile-390", "mobile-430"]);
 
 test.describe("public digital card", () => {
-  test("index page loads with core identity and prominent CV action", async ({
+  test("index page loads with core identity and refined action hierarchy", async ({
     page,
     qa
   }) => {
@@ -20,16 +20,21 @@ test.describe("public digital card", () => {
 
     await expect(page.getByRole("heading", { name: "Jack Tinsley" })).toBeVisible();
     await expect(page.getByText("Interdisciplinary Practitioner")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Save my details" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Other work" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Selected profile" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Risk & Operations Profile" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Save my details" })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "Other work" })).toHaveCount(0);
     await expect(page.getByText("Problem Solving · Adaptability · Efficiency")).toHaveCount(0);
     await expect(page.getByText("Next steps")).toHaveCount(0);
     await expect(page.getByText("Fallback contact file")).toHaveCount(0);
-    await expect(page.getByText("Ready to share.")).toBeHidden();
+    await expect(page.getByText("Ready.")).toBeHidden();
 
+    const addButton = page.locator('[data-action-key="addToContacts"]');
     const cvButton = page.locator('[data-action-key="viewCv"]');
+    await expect(addButton).toBeVisible();
+    await expect(addButton).toHaveAttribute("data-variant", "primary");
     await expect(cvButton).toBeVisible();
-    await expect(cvButton).toHaveAttribute("data-variant", "primary");
+    await expect(cvButton).toHaveAttribute("data-variant", "secondary");
   });
 
   test("blank public fields are hidden when config values are empty", async ({ page }, testInfo) => {
@@ -133,7 +138,7 @@ test.describe("public digital card", () => {
     }
   });
 
-  test("desktop layout uses the immersive shell without horizontal scroll", async ({
+  test("desktop layout uses a centered static shell without horizontal scroll", async ({
     page
   }, testInfo) => {
     test.skip(
@@ -148,13 +153,12 @@ test.describe("public digital card", () => {
     const viewport = page.viewportSize();
     expect(shellBox).not.toBeNull();
     expect(viewport).not.toBeNull();
-    expect(shellBox.width).toBeGreaterThanOrEqual(viewport.width - 1);
-    expect(shellBox.width).toBeLessThanOrEqual(viewport.width + 1);
-    await expect(page.locator("html")).toHaveClass(/public-scroll-snap/);
-    await expect(page.locator(".hero-card")).toHaveCSS("scroll-snap-align", "start");
-    await expect(page.locator(".content-flow")).toHaveCSS("scroll-snap-align", "start");
+    expect(shellBox.width).toBeLessThanOrEqual(1121);
+    expect(shellBox.width).toBeLessThanOrEqual(viewport.width - 31);
+    await expect(page.locator("html")).not.toHaveClass(/public-scroll-snap/);
+    await expect(page.locator(".hero-card")).not.toHaveCSS("scroll-snap-align", "start");
 
     await expect(page.locator(".resource-grid")).toBeVisible();
-    await expect(page.locator(".site-footer")).toHaveCount(0);
+    await expect(page.locator(".site-footer")).toBeVisible();
   });
 });
