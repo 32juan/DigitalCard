@@ -9,75 +9,58 @@ const {
   assertWithinViewport
 } = require("./helpers");
 
-const MOBILE_PROJECTS = new Set(["mobile-360", "mobile-390", "mobile-430"]);
+const RESPONSIVE_PROJECTS = new Set(["mobile-360", "mobile-390", "mobile-430", "tablet-768"]);
 
 test.describe("public digital card", () => {
-  test("index page loads with core identity and refined action hierarchy", async ({
-    page,
-    qa
-  }) => {
+  test("index page loads as a simple card with only required actions", async ({ page }) => {
     await page.goto("/index.html");
 
+    await expect(page.getByRole("img", { name: "Jack Tinsley business card" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Jack Tinsley" })).toBeVisible();
-    await expect(page.getByText("Interdisciplinary Practitioner")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Selected profile" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Risk & Operations Profile" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Save my details" })).toHaveCount(0);
+    await expect(page.getByText("interdisciplinary practitioner")).toBeVisible();
+    await expect(page.locator(".action-group--primary .button:visible")).toHaveCount(2);
+    await expect(page.locator(".action-group--secondary .button:visible")).toHaveCount(2);
+    await expect(page.locator(".action-group--utility .button:visible")).toHaveCount(3);
+    await expect(page.locator('[data-action-key="email"]')).toHaveClass(/button--primary/);
+    await expect(page.locator('[data-action-key="viewCv"]')).toHaveClass(/button--primary/);
+    await expect(page.getByRole("button", { name: "Add to Contacts" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "View / Download CV" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "LinkedIn" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Email" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Copy Email" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Copy Website" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Copy All Details" })).toBeVisible();
+    await expect(page.getByText("Static digital card. No tracking. No cookies.")).toBeVisible();
+
     await expect(page.getByRole("heading", { name: "Other work" })).toHaveCount(0);
-    await expect(page.getByText("Problem Solving · Adaptability · Efficiency")).toHaveCount(0);
-    await expect(page.getByText("Next steps")).toHaveCount(0);
-    await expect(page.getByText("Fallback contact file")).toHaveCount(0);
-    await expect(page.getByText("Ready.")).toBeHidden();
-
-    const addButton = page.locator('[data-action-key="addToContacts"]');
-    const cvButton = page.locator('[data-action-key="viewCv"]');
-    await expect(addButton).toBeVisible();
-    await expect(addButton).toHaveAttribute("data-variant", "primary");
-    await expect(cvButton).toBeVisible();
-    await expect(cvButton).toHaveAttribute("data-variant", "secondary");
+    await expect(page.getByRole("heading", { name: "Selected profile" })).toHaveCount(0);
+    await expect(page.getByText("Ready to share")).toHaveCount(0);
+    await expect(page.locator(".resource-grid")).toHaveCount(0);
   });
 
-  test("blank public fields are hidden when config values are empty", async ({ page }, testInfo) => {
-    test.skip(
-      testInfo.project.name !== "mobile-390",
-      "Blank-field visibility only needs one representative browser pass."
-    );
-
-    await page.goto("/index.html");
-
-    await expect(page.getByRole("link", { name: "Email Jack" })).toHaveCount(0);
-    await expect(page.getByRole("link", { name: "LinkedIn" })).toHaveCount(1);
-    await expect(page.locator('[data-action-key="copyEmail"]')).toHaveCount(0);
-    await expect(page.locator('[data-action-key="copyPhone"]')).toHaveCount(0);
-    await expect(page.locator('[data-action-key="copyWebsite"]')).toHaveCount(1);
-    await expect(page.locator(".manual-copy-panel")).toBeHidden();
-  });
-
-  test("CV button points to the bundled PDF and the file is reachable", async ({
-    page,
-    request
-  }, testInfo) => {
+  test("links are populated from config", async ({ page, request }, testInfo) => {
     test.skip(
       testInfo.project.name !== "desktop-1280",
-      "CV path and file fetch only need one representative pass."
+      "Link and file checks only need one representative pass."
     );
 
     await page.goto("/index.html");
 
-    const cvButton = page.locator('[data-action-key="viewCv"]');
-    const href = await cvButton.getAttribute("href");
+    const cvHref = await page.locator('[data-action-key="viewCv"]').getAttribute("href");
+    const linkedInHref = await page.locator('[data-action-key="linkedIn"]').getAttribute("href");
+    const emailHref = await page.locator('[data-action-key="email"]').getAttribute("href");
 
-    expect(href).toBe("assets/jack-tinsley-cv.pdf");
-    expect(fs.existsSync(path.join(process.cwd(), href))).toBe(true);
+    expect(cvHref).toBe("assets/jack-tinsley-cv.pdf");
+    expect(linkedInHref).toBe("https://www.linkedin.com/in/jacktinsley0");
+    expect(emailHref).toBe("mailto:jacktinsley0@outlook.com");
+    expect(fs.existsSync(path.join(process.cwd(), cvHref))).toBe(true);
 
-    const response = await request.get(`http://127.0.0.1:4173/${href}`);
+    const response = await request.get(`http://127.0.0.1:4173/${cvHref}`);
     expect(response.ok()).toBeTruthy();
     expect(response.headers()["content-type"]).toContain("application/pdf");
   });
 
-  test("Add to Contacts generates a vCard without blank email or phone fields", async ({
-    page
-  }, testInfo) => {
+  test("Add to Contacts generates a valid vCard download", async ({ page }, testInfo) => {
     test.skip(
       testInfo.project.name !== "mobile-390",
       "Generated vCard content only needs one representative browser pass."
@@ -91,14 +74,48 @@ test.describe("public digital card", () => {
     expect(downloads).toHaveLength(1);
     expect(downloads[0].filename).toBe("jack-tinsley.vcf");
     expect(downloads[0].mimeType).toContain("text/vcard");
+    expect(downloads[0].content).toContain("BEGIN:VCARD\r\nVERSION:3.0");
     expect(downloads[0].content).toContain("FN:Jack Tinsley");
-    expect(downloads[0].content).toContain("TITLE:Interdisciplinary Practitioner");
-    expect(downloads[0].content).toContain("ORG:London Interdisciplinary School");
-    expect(downloads[0].content).not.toContain("EMAIL;TYPE=INTERNET:");
-    expect(downloads[0].content).not.toContain("TEL;TYPE=CELL:");
+    expect(downloads[0].content).toContain("TITLE:interdisciplinary practitioner");
+    expect(downloads[0].content).toContain("EMAIL;TYPE=INTERNET:jacktinsley0@outlook.com");
+    expect(downloads[0].content).toContain("TEL;TYPE=CELL:+44 7404 607171");
+    expect(downloads[0].content).toContain(
+      "X-SOCIALPROFILE;TYPE=linkedin:https://www.linkedin.com/in/jacktinsley0"
+    );
   });
 
-  test("copy action falls back gracefully when clipboard access is unavailable", async ({
+  test("copy buttons provide success feedback", async ({ page }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== "mobile-390",
+      "Clipboard behavior only needs one representative browser pass."
+    );
+
+    await page.addInitScript(() => {
+      window.__copiedText = [];
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: {
+          writeText(value) {
+            window.__copiedText.push(value);
+            return Promise.resolve();
+          }
+        }
+      });
+    });
+
+    await page.goto("/index.html");
+    await page.locator('[data-action-key="copyEmail"]').click();
+    await expect(page.locator("#page-status")).toContainText("Email copied.");
+    expect(await page.evaluate(() => window.__copiedText[window.__copiedText.length - 1])).toBe(
+      "jacktinsley0@outlook.com"
+    );
+
+    await page.locator('[data-action-key="copyWebsite"]').click();
+
+    await expect(page.locator("#page-status")).toContainText("Website copied.");
+  });
+
+  test("copy action falls back gracefully when clipboard and execCommand fail", async ({
     page
   }, testInfo) => {
     test.skip(
@@ -107,40 +124,49 @@ test.describe("public digital card", () => {
     );
 
     await forceClipboardFailure(page);
+    await page.addInitScript(() => {
+      document.execCommand = () => false;
+    });
     await page.goto("/index.html");
 
     await page.locator('[data-action-key="copyAll"]').click();
 
     await expect(page.locator("#manual-copy-panel")).toBeVisible();
     await expect(page.locator("#manual-copy-value")).toHaveValue(/Jack Tinsley/);
-    await expect(page.locator("#page-status")).toContainText(
-      /Clipboard access unavailable here|Clipboard access failed/
+    await expect(page.locator("#manual-copy-value")).toHaveValue(/interdisciplinary practitioner/);
+    await expect(page.locator("#manual-copy-value")).toHaveValue(/Email: jacktinsley0@outlook.com/);
+    await expect(page.locator("#manual-copy-value")).toHaveValue(/Phone: \+44 7404 607171/);
+    await expect(page.locator("#manual-copy-value")).toHaveValue(
+      /LinkedIn: https:\/\/www\.linkedin\.com\/in\/jacktinsley0/
     );
+    await expect(page.locator("#page-status")).toContainText("Copy failed");
   });
 
-  test("mobile layouts avoid horizontal scrolling and clipped primary actions", async ({
+  test("responsive layouts avoid horizontal scrolling and clipped actions", async ({
     page
   }, testInfo) => {
-    test.skip(!MOBILE_PROJECTS.has(testInfo.project.name), "Mobile assertions only run on mobile projects.");
+    test.skip(
+      !RESPONSIVE_PROJECTS.has(testInfo.project.name),
+      "Responsive assertions run on mobile and tablet projects."
+    );
 
     await page.goto("/index.html");
 
     await assertNoHorizontalScroll(page, expect);
-    await assertWithinViewport(page.locator(".hero-card"), page, expect);
+    await assertWithinViewport(page.locator(".digital-card"), page, expect);
+    await assertWithinViewport(page.locator(".business-card-box"), page, expect);
 
-    const primaryActions = page.locator(".action-grid--primary .button");
-    const actionCount = await primaryActions.count();
-    expect(actionCount).toBeGreaterThan(1);
+    const actions = page.locator(".actions .button:visible");
+    const actionCount = await actions.count();
+    expect(actionCount).toBe(7);
 
     for (let index = 0; index < actionCount; index += 1) {
-      await assertWithinViewport(primaryActions.nth(index), page, expect);
-      await expect(primaryActions.nth(index)).toBeVisible();
+      await assertWithinViewport(actions.nth(index), page, expect);
+      await expect(actions.nth(index)).toBeVisible();
     }
   });
 
-  test("desktop layout uses a centered static shell without horizontal scroll", async ({
-    page
-  }, testInfo) => {
+  test("desktop layout stays centered and controlled", async ({ page }, testInfo) => {
     test.skip(
       testInfo.project.name !== "desktop-1280",
       "Desktop layout only needs one representative browser pass."
@@ -149,16 +175,16 @@ test.describe("public digital card", () => {
     await page.goto("/index.html");
 
     await assertNoHorizontalScroll(page, expect);
-    const shellBox = await page.locator(".page-shell-card").boundingBox();
-    const viewport = page.viewportSize();
-    expect(shellBox).not.toBeNull();
-    expect(viewport).not.toBeNull();
-    expect(shellBox.width).toBeLessThanOrEqual(1121);
-    expect(shellBox.width).toBeLessThanOrEqual(viewport.width - 31);
-    await expect(page.locator("html")).not.toHaveClass(/public-scroll-snap/);
-    await expect(page.locator(".hero-card")).not.toHaveCSS("scroll-snap-align", "start");
 
-    await expect(page.locator(".resource-grid")).toBeVisible();
-    await expect(page.locator(".site-footer")).toBeVisible();
+    const shellBox = await page.locator(".site-shell").boundingBox();
+    const actionsBox = await page.locator(".actions").boundingBox();
+    const imageBox = await page.locator(".business-card-box").boundingBox();
+
+    expect(shellBox).not.toBeNull();
+    expect(actionsBox).not.toBeNull();
+    expect(imageBox).not.toBeNull();
+    expect(shellBox.width).toBeLessThanOrEqual(641);
+    expect(actionsBox.width).toBeLessThanOrEqual(481);
+    expect(imageBox.width).toBeLessThanOrEqual(569);
   });
 });

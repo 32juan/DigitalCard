@@ -8,20 +8,131 @@
     />
     <meta
       name="description"
-      content="A static digital business card for Jack Tinsley."
+      content="A simple static digital card for Jack Tinsley."
     />
-    <title>Jack Tinsley | Digital Card</title>
-    <link rel="stylesheet" href="styles.css?v=redesign-20260527" />
-    <script src="config.js?v=redesign-20260527"></script>
-    <script src="script.js?v=redesign-20260527" defer></script>
+    <title>Digital Card</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="config.js"></script>
+    <script src="script.js" defer></script>
   </head>
   <body data-page="public">
-    <main class="app-shell">
+    <main class="site-shell" aria-labelledby="page-title">
+      <section class="digital-card">
+        <figure class="business-card-box">
+          <img
+            id="business-card-image"
+            src="assets/business-card.png"
+            alt="Jack Tinsley business card"
+            width="1050"
+            height="600"
+          />
+        </figure>
+
+        <header class="identity-block">
+          <h1 id="page-title">Jack Tinsley</h1>
+          <p id="page-descriptor">interdisciplinary practitioner</p>
+        </header>
+
+        <div class="actions" aria-label="Contact actions">
+          <div class="action-group action-group--primary" aria-label="Primary contact actions">
+            <a
+              class="button button--primary"
+              href="#"
+              data-config-link="email"
+              data-action-key="email"
+            >
+              Email
+            </a>
+
+            <a
+              class="button button--primary"
+              href="#"
+              target="_blank"
+              rel="noopener"
+              data-config-link="cv"
+              data-action-key="viewCv"
+            >
+              View / Download CV
+            </a>
+          </div>
+
+          <div class="action-group action-group--secondary" aria-label="Secondary contact actions">
+            <a
+              class="button button--secondary"
+              href="#"
+              target="_blank"
+              rel="noopener"
+              data-config-link="linkedin"
+              data-action-key="linkedIn"
+            >
+              LinkedIn
+            </a>
+
+            <button
+              class="button button--secondary"
+              type="button"
+              data-card-action="download-vcard"
+              data-action-key="addToContacts"
+            >
+              Add to Contacts
+            </button>
+          </div>
+
+          <div class="action-group action-group--utility" aria-label="Copy actions">
+            <button
+              class="button button--utility"
+              type="button"
+              data-card-action="copy-email"
+              data-action-key="copyEmail"
+            >
+              Copy Email
+            </button>
+
+            <button
+              class="button button--utility"
+              type="button"
+              data-card-action="copy-website"
+              data-action-key="copyWebsite"
+            >
+              Copy Website
+            </button>
+
+            <button
+              class="button button--utility"
+              type="button"
+              data-card-action="copy-all"
+              data-action-key="copyAll"
+            >
+              Copy All Details
+            </button>
+          </div>
+        </div>
+
+        <div class="manual-copy" id="manual-copy-panel" hidden>
+          <label class="manual-copy__label" for="manual-copy-value">
+            Copy this text manually
+          </label>
+          <textarea id="manual-copy-value" readonly></textarea>
+          <button
+            class="button button--small"
+            type="button"
+            data-card-action="close-manual-copy"
+          >
+            Close
+          </button>
+        </div>
+
+        <p class="status" id="page-status" role="status" aria-live="polite" hidden></p>
+
+        <footer class="site-footer">
+          <p><strong id="footer-name"></strong></p>
+          <p>Static digital card. No tracking. No cookies.</p>
+        </footer>
+      </section>
+
       <noscript class="noscript-note">
-        This static card uses JavaScript to load Jack Tinsley&rsquo;s details,
-        contact card and link controls.
+        JavaScript is needed for the contact download and copy buttons.
       </noscript>
-      <div id="app-root"></div>
     </main>
   </body>
 </html>

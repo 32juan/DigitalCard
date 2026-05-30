@@ -15,7 +15,7 @@ test.describe("manual screenshot capture", () => {
     test.skip(!fileNames[project], "This capture only runs on the requested index review widths.");
 
     await page.goto("/index.html");
-    await expect(page.getByRole("heading", { name: "Jack Tinsley" })).toBeVisible();
+    await expect(page.getByRole("img", { name: "Jack Tinsley business card" })).toBeVisible();
 
     const screenshotPath = await saveScreenshot(page, fileNames[project]);
     expect(fs.existsSync(screenshotPath)).toBe(true);

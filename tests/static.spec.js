@@ -16,6 +16,7 @@ test("static project files and references are present", async ({}, testInfo) => 
     "card-preview.html",
     "card-preview.js",
     "README.md",
+    "assets/business-card.png",
     "assets/jack-tinsley-cv.pdf",
     "assets/jack-tinsley.vcf",
     "assets/qr-code.svg",
@@ -40,15 +41,19 @@ test("static project files and references are present", async ({}, testInfo) => 
   expect(previewHtml).toContain("card-preview.js");
 
   expect(configText).toContain("window.CARD_CONFIG");
-  expect(configText).toContain("profile");
-  expect(configText).toContain("contact");
-  expect(configText).toContain("links");
-  expect(configText).toContain("theme");
-  expect(configText).toContain("layout");
-  expect(configText).toContain("meta");
+  expect(configText).toContain("name");
+  expect(configText).toContain("descriptor");
+  expect(configText).toContain("email");
+  expect(configText).toContain("website");
+  expect(configText).toContain("linkedInUrl");
+  expect(configText).toContain("cvPath");
+  expect(configText).toContain("vCard");
 
   expect(vcard).toContain("BEGIN:VCARD");
   expect(vcard).toContain("VERSION:3.0");
   expect(vcard).toContain("FN:Jack Tinsley");
+  expect(vcard).toContain("EMAIL;TYPE=INTERNET:jacktinsley0@outlook.com");
+  expect(vcard).toContain("TEL;TYPE=CELL:+44 7404 607171");
+  expect(vcard).toContain("X-SOCIALPROFILE;TYPE=linkedin:https://www.linkedin.com/in/jacktinsley0");
   expect(readme).toContain("Testing and QA");
 });

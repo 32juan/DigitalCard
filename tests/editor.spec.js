@@ -18,16 +18,16 @@ test.describe("local editor", () => {
 
     await expect(page.locator('input[data-path="profile.name"]')).toHaveValue("Jack Tinsley");
     await expect(page.locator('input[data-path="profile.title"]')).toHaveValue(
-      "Interdisciplinary Practitioner"
+      "interdisciplinary practitioner"
     );
 
     const titleField = page.locator('input[data-path="profile.title"]');
     await titleField.fill("Systems & Operations Practitioner");
 
-    await expect(page.locator("#editor-preview-root")).toContainText(
-      "Systems & Operations Practitioner"
-    );
     await expect(page.locator("#editor-status")).toContainText("Draft saved locally");
+
+    const draftTitle = await page.evaluate(() => window.CardSystem.getDraftConfig().descriptor);
+    expect(draftTitle).toBe("Systems & Operations Practitioner");
   });
 
   test("editor exports an updated config.js and fallback vCard", async ({
